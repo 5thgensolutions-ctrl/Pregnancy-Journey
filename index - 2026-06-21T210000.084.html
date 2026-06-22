@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baby's Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --forest: #2D4A3E; --forest-light: #3D6355; --cream: #FAF7F2;
+    --blush: #E8C4B8; --blush-light: #F5E6E0; --gold: #C9A96E;
+    --gold-light: #E8D5B0; --text-dark: #1A2E26; --text-mid: #4A6558;
+    --text-light: #7A9488; --card-bg: #FFFFFF; --border: #E8E2D9;
+    --sage: #E8F0EB; --sage-dark: #2D5A3E;
+  }
+  body { font-family:'Inter',sans-serif; background:var(--cream); color:var(--text-dark); min-height:100vh; }
+  header { background:var(--forest); padding:20px 32px; display:flex; align-items:center; justify-content:space-between; }
+  header .brand { font-family:'Playfair Display',serif; color:var(--gold-light); font-size:1.1rem; letter-spacing:0.5px; }
+  header .live-badge { display:flex; align-items:center; gap:6px; font-size:0.75rem; color:var(--blush); font-weight:500; letter-spacing:0.5px; }
+  .pulse-dot { width:7px; height:7px; background:#7EC88A; border-radius:50%; animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+  .hero { background:linear-gradient(160deg,var(--forest) 0%,var(--forest-light) 100%); padding:48px 32px 56px; display:flex; flex-direction:column; align-items:center; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-60px; right:-60px; width:280px; height:280px; background:radial-gradient(circle,rgba(201,169,110,0.12) 0%,transparent 70%); pointer-events:none; }
+  .hero-top { display:flex; align-items:center; gap:48px; width:100%; max-width:900px; justify-content:center; flex-wrap:wrap; }
+  .ring-wrap { position:relative; flex-shrink:0; }
+  .ring-svg { transform:rotate(-90deg); filter:drop-shadow(0 0 18px rgba(201,169,110,0.3)); }
+  .ring-track { fill:none; stroke:rgba(255,255,255,0.1); stroke-width:10; }
+  .ring-fill { fill:none; stroke:var(--gold); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1); }
+  .ring-inner { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
+  .baby-emoji { font-size:3rem; line-height:1; animation:float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+  .ring-week-label { font-family:'Playfair Display',serif; font-size:0.85rem; color:var(--gold-light); margin-top:2px; letter-spacing:1px; text-transform:uppercase; }
+  .hero-text { color:white; text-align:center; }
+  .hero-eyebrow { font-size:0.7rem; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--blush); margin-bottom:8px; }
+  .hero-week { font-family:'Playfair Display',serif; font-size:clamp(2.8rem,6vw,4.2rem); line-height:1; color:white; margin-bottom:4px; }
+  .hero-week span { color:var(--gold); }
+  .hero-trimester { font-size:0.9rem; color:var(--blush); margin-bottom:20px; font-style:italic; }
+  .countdown { display:flex; gap:16px; margin-top:4px; flex-wrap:wrap; justify-content:center; }
+  .cd-unit { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:10px 16px; text-align:center; min-width:62px; }
+  .cd-num { font-family:'Playfair Display',serif; font-size:1.6rem; color:white; line-height:1; font-weight:700; }
+  .cd-label { font-size:0.62rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold-light); margin-top:2px; }
+  .due-bar { margin-top:28px; display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:30px; padding:8px 20px; font-size:0.8rem; color:var(--blush-light); }
+  .due-bar strong { color:var(--gold-light); font-weight:600; }
+  #clock-display { font-size:0.75rem; color:var(--text-light); text-align:center; margin-top:12px; letter-spacing:0.5px; }
+  .cards-section { max-width:1060px; margin:0 auto; padding:36px 24px 60px; display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
+  .card { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:24px; transition:transform 0.2s,box-shadow 0.2s; }
+  .card:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(45,74,62,0.1); }
+  .card.wide { grid-column:1/-1; }
+  .card-icon { font-size:1.6rem; margin-bottom:12px; display:block; }
+  .card-label { font-size:0.65rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--text-light); margin-bottom:6px; }
+  .card-title { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--forest); margin-bottom:12px; line-height:1.3; }
+  .card-body { font-size:0.875rem; line-height:1.7; color:var(--text-mid); }
+  .size-visual { display:flex; align-items:center; gap:20px; margin-top:12px; background:var(--blush-light); border-radius:12px; padding:16px; }
+  .size-emoji-big { font-size:3rem; flex-shrink:0; }
+  .size-name { font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--forest); margin-bottom:4px; }
+  .size-stats { display:flex; gap:12px; margin-top:8px; flex-wrap:wrap; }
+  .size-stat { text-align:center; background:white; border-radius:8px; padding:6px 12px; }
+  .size-stat-val { font-weight:700; font-size:0.9rem; color:var(--forest); }
+  .size-stat-label { font-size:0.65rem; color:var(--text-light); text-transform:uppercase; letter-spacing:1px; }
+  .pill-wrap { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  .pill { font-size:0.75rem; font-weight:500; padding:5px 12px; border-radius:20px; border:1px solid var(--blush); background:var(--blush-light); color:var(--forest); }
+  .pill.gold { background:var(--gold-light); border-color:var(--gold); }
+  .dev-item { margin-bottom:8px; padding-left:12px; border-left:3px solid var(--blush); font-size:0.875rem; line-height:1.6; color:var(--text-mid); }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+  .grid-item { display:flex; align-items:flex-start; gap:8px; font-size:0.8rem; color:var(--text-mid); background:#F9F6F2; border-radius:8px; padding:8px 10px; }
+  .grid-dot { width:6px; height:6px; border-radius:50%; background:var(--gold); flex-shrink:0; margin-top:5px; }
+  .nutrition-list { display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+  .nutrition-item { display:flex; align-items:flex-start; gap:10px; font-size:0.85rem; line-height:1.5; color:var(--text-mid); }
+  .nutrition-item strong { color:var(--forest); font-weight:600; }
+  .appt-item { display:flex; align-items:flex-start; gap:10px; font-size:0.85rem; color:var(--text-mid); padding:8px; background:#F9F6F2; border-radius:8px; line-height:1.5; }
+  .appt-list { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+  .progress-wrap { margin-top:14px; }
+  .progress-header { display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-light); margin-bottom:6px; }
+  .progress-bar-bg { height:8px; background:var(--blush-light); border-radius:4px; overflow:hidden; }
+  .progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--gold) 0%,#A07840 100%); border-radius:4px; transition:width 1s cubic-bezier(0.4,0,0.2,1); }
+  .trimester-markers { display:flex; justify-content:space-between; margin-top:4px; font-size:0.65rem; color:var(--text-light); }
+
+  /* PARTNER CARD — deep forest with gold accents */
+  .partner-card { background:linear-gradient(145deg,#1A3329 0%,var(--forest) 100%); border:1px solid rgba(201,169,110,0.25); }
+  .partner-card .card-label { color:var(--gold-light); }
+  .partner-card .card-title { color:white; }
+  .partner-card .partner-section-title { font-size:0.7rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin:16px 0 8px; }
+  .partner-card .partner-item { display:flex; align-items:flex-start; gap:10px; font-size:0.855rem; color:rgba(255,255,255,0.82); line-height:1.65; margin-bottom:10px; }
+  .partner-card .partner-item-icon { font-size:1rem; flex-shrink:0; margin-top:2px; }
+  .partner-card .partner-divider { height:1px; background:rgba(255,255,255,0.1); margin:14px 0; }
+
+  /* BABY BENEFIT CARD — rich deep blue-green */
+  .benefit-card { background:linear-gradient(145deg,#1C3A45 0%,#2A5566 100%); border:1px solid rgba(126,200,138,0.2); }
+  .benefit-card .card-label { color:#A8E6B0; }
+  .benefit-card .card-title { color:white; }
+  .benefit-card .benefit-item { display:flex; align-items:flex-start; gap:10px; font-size:0.855rem; color:rgba(255,255,255,0.82); line-height:1.65; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.08); }
+  .benefit-card .benefit-item:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+  .benefit-card .benefit-icon { font-size:1.1rem; flex-shrink:0; margin-top:2px; }
+  .benefit-card .benefit-label { font-size:0.7rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#7ECFBA; margin-bottom:3px; }
+  .benefit-card .research-tag { display:inline-block; font-size:0.65rem; font-weight:600; padding:2px 8px; border-radius:10px; background:rgba(126,207,186,0.15); border:1px solid rgba(126,207,186,0.3); color:#7ECFBA; margin-top:4px; letter-spacing:0.5px; }
+
+  footer { text-align:center; padding:20px; font-size:0.72rem; color:var(--text-light); border-top:1px solid var(--border); }
+  @media(max-width:680px) {
+    .hero { padding:32px 18px 48px; }
+    .hero-top { gap:28px; }
+    .countdown { gap:10px; }
+    .grid2 { grid-template-columns:1fr; }
+    .cards-section { padding:24px 14px 48px; gap:14px; }
+    .partner-cols { grid-template-columns:1fr !important; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand" style="display:flex;flex-direction:column;gap:2px;">
+    <div style="font-family:'Playfair Display',serif;color:var(--gold-light);font-size:1.25rem;letter-spacing:0.5px;">Baby's Journey ✨</div>
+    <div style="font-size:0.68rem;color:var(--blush);letter-spacing:2.5px;text-transform:uppercase;font-weight:500;">Hubby · Wifey · Little One</div>
+  </div>
+  <div class="live-badge"><div class="pulse-dot"></div>LIVE · CENTRAL TIME</div>
+</header>
+<div class="hero">
+  <div class="hero-top">
+    <div class="ring-wrap">
+      <svg class="ring-svg" width="170" height="170" viewBox="0 0 170 170">
+        <circle class="ring-track" cx="85" cy="85" r="75"/>
+        <circle class="ring-fill" id="ring-fill" cx="85" cy="85" r="75" stroke-dasharray="471.2" stroke-dashoffset="471.2"/>
+      </svg>
+      <div class="ring-inner">
+        <div class="baby-emoji" id="baby-emoji">🌱</div>
+        <div class="ring-week-label" id="ring-label">Week —</div>
+      </div>
+    </div>
+    <div class="hero-text">
+      <div class="hero-eyebrow">Our little one is growing</div>
+      <div class="hero-week">Week <span id="week-num">—</span></div>
+      <div class="hero-trimester" id="trimester-label">Loading…</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold-light);margin-bottom:18px;letter-spacing:0.5px;" id="hero-nickname">🤍 Baby is on the way</div>
+      <div class="countdown">
+        <div class="cd-unit"><div class="cd-num" id="cd-days">—</div><div class="cd-label">Days</div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-hours">—</div><div class="cd-label">Hours</div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-min">—</div><div class="cd-label">Min</div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-sec">—</div><div class="cd-label">Sec</div></div>
+      </div>
+      <div class="due-bar">🌟 Expected arrival: <strong>January 15, 2027</strong></div>
+      <div id="clock-display">Loading Central Time…</div>
+    </div>
+  </div>
+  <div id="affirmation-banner" style="width:100%;max-width:920px;margin-top:32px;background:rgba(255,255,255,0.07);border:1px solid rgba(201,169,110,0.2);border-radius:16px;padding:20px 28px;text-align:center;">
+    <div style="font-size:0.62rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">This Week's Affirmation for Wifey</div>
+    <div id="affirmation-text" style="font-family:'Playfair Display',serif;font-size:1.05rem;font-style:italic;color:rgba(255,255,255,0.92);line-height:1.75;">Loading…</div>
+  </div>
+  <div style="width:100%;max-width:920px;margin-top:14px;background:rgba(232,196,184,0.1);border:1px solid rgba(232,196,184,0.18);border-radius:16px;padding:16px 28px;display:flex;align-items:center;gap:16px;">
+    <div style="font-size:1.4rem;flex-shrink:0;">🌿</div>
+    <div>
+      <div style="font-size:0.62rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blush);margin-bottom:5px;">This Week's Shared Intention — Hubby & Wifey</div>
+      <div id="intention-text" style="font-size:0.875rem;color:rgba(255,255,255,0.82);line-height:1.65;">Loading…</div>
+    </div>
+  </div>
+</div>
+<div class="cards-section" id="cards-section"></div>
+<footer style="text-align:center;padding:28px 24px;border-top:1px solid var(--border);">
+  <div style="font-size:1.3rem;margin-bottom:8px;">🤍</div>
+  <div style="font-family:'Playfair Display',serif;font-size:0.95rem;color:var(--forest);font-style:italic;margin-bottom:6px;">Every week is a miracle. Every day counts. You are both doing beautifully.</div>
+  <div style="font-size:0.7rem;color:var(--text-light);">LMP: April 10, 2026 · Due: January 15, 2027 · Central Time · For guidance always consult your OB or midwife</div>
+</footer>
+
+<script>
+const LMP_DATE = new Date('2026-04-10T00:00:00');
+const DUE_DATE_LOCAL = new Date('2027-01-15T00:00:00');
+function getLMP() { return new Date(LMP_DATE); }
+
+function getCentralNow() {
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone:'America/Chicago', year:'numeric', month:'2-digit', day:'2-digit',
+    hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
+  }).formatToParts(now);
+  const get = t => parts.find(p => p.type === t).value;
+  const h = get('hour') === '24' ? '00' : get('hour');
+  return new Date(get('year')+'-'+get('month')+'-'+get('day')+'T'+h+':'+get('minute')+':'+get('second'));
+}
+
+function getWeek() {
+  const lmp = getLMP(), now = getCentralNow();
+  const lmpDay = new Date(lmp.getFullYear(), lmp.getMonth(), lmp.getDate());
+  const nowDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diff = nowDay - lmpDay;
+  if (diff < 0) return 0;
+  return Math.min(Math.max(Math.floor(diff / (7*24*60*60*1000)), 1), 40);
+}
+
+function getDaysRemaining() { return Math.max(0, DUE_DATE_LOCAL - getCentralNow()); }
+function getTrimester(w) { return w<=13?'First Trimester':w<=27?'Second Trimester':'Third Trimester'; }
+function getProgress(w) { return Math.min((w/40)*100,100); }
+
+// ─────────────────────────────────────────────
+// WEEK DATA
+// ─────────────────────────────────────────────
+const weekData = {
+
+default_early: {
+  emoji:'🌱', sizeName:'Poppy seed', sizeEmoji:'🌸', lengthCm:0.1, weightG:0,
+  development:['The fertilized egg has implanted into the uterine lining and is now called a blastocyst','The amniotic sac and yolk sac are forming, creating your baby\'s first protective environment','The placenta is beginning to develop — it will nourish your baby for the entire pregnancy','Cells are already differentiating into what will become the brain, spine, heart, and all major organs'],
+  momFeels:['Light spotting from implantation is completely normal and reassuring','Mild cramping as the uterus adjusts to its new role','Fatigue as hormone levels begin their dramatic rise','A heightened sense of smell is often one of the very first signs'],
+  mentalHealth:'This is an emotionally rich time. Excitement, nervousness, and wonder all living together is completely normal. Many parents find that writing down what they feel each week — even a few sentences — becomes one of the most meaningful keepsakes of the pregnancy.',
+  nutrition:[
+    {icon:'💊', name:'Folic Acid', detail:'400–800 mcg daily — the single most critical nutrient right now, protecting the neural tube as it forms. Most prenatal vitamins contain this but confirm yours does'},
+    {icon:'🥛', name:'Calcium', detail:'1,000 mg/day from dairy, leafy greens, or fortified alternatives — cell structure and bone formation depend on it'},
+    {icon:'💧', name:'Hydration', detail:'8–10 cups of water daily — amniotic fluid production begins now and comes entirely from maternal hydration'},
+    {icon:'🌿', name:'Iron', detail:'27 mg/day — blood volume will increase 50% during pregnancy and every red blood cell requires iron to carry oxygen to your baby'}
+  ],
+  exercise:'Begin pelvic floor exercises (Kegels) now — 3 sets of 10 slow holds daily. These support the uterus, bladder, and will significantly aid recovery after birth. Light walking is excellent.',
+  sleep:'Your body is doing enormous work even if nothing shows yet. Rest without guilt. Begin practicing left-side sleeping now — it becomes critical after week 20 for optimal blood flow to the placenta.',
+  appointments:['Schedule your first prenatal visit for around week 8–10','Begin prenatal vitamins with folic acid immediately','Confirm pregnancy with your provider through bloodwork'],
+  apptDetail:['Your first visit includes a full health history, blood type, Rh factor, CBC, rubella immunity, STI screening, and urine culture — all routine baselines that matter for the entire pregnancy.'],
+  partnerDeep:{
+    physical:[
+      {icon:'🍽️', act:'Take over all food preparation', why:'Smell and nausea aversions are neurologically driven — she has no control over them. You removing her from the equation of cooking is one of the highest-impact physical acts you can do right now.'},
+      {icon:'💆', act:'Learn and give daily neck and shoulder massage', why:'Tension accumulates in the shoulders, neck, and upper back from fatigue and nausea. A consistent 10-minute massage before bed reduces cortisol, improves sleep quality, and directly benefits the baby through lowered maternal stress hormones.'},
+      {icon:'🧹', act:'Own the household completely right now', why:'She is building a placenta from scratch while managing surging hormones. Every task you take off her plate is energy redirected to the baby. This is not helping out — this is your primary job right now.'}
+    ],
+    psychological:[
+      {icon:'🗣️', act:'Ask one open question every day and then just listen', why:'Do not fix, advise, or redirect. The question: "What does today feel like?" Then be quiet. The emotional processing she does out loud reduces anxiety hormones that cross the placenta.'},
+      {icon:'📖', act:'Read about what is happening in her body this week', why:'When you understand what progesterone and hCG are doing to her brain and body, you stop taking mood changes personally and become genuinely supportive. Knowledge is the foundation of patience.'},
+      {icon:'🛡️', act:'Become her buffer from stress sources', why:'Identify the people, conversations, and situations that raise her stress and intercept them. This is not overprotection — maternal cortisol in the first trimester directly affects fetal neurological development.'}
+    ]
+  },
+  babyBenefit:[
+    {icon:'🧘', label:'Maternal Stress Reduction', desc:'The single highest-impact thing you can both do for your baby right now is reduce maternal cortisol. Stress hormones cross the placenta and influence fetal brain development. Breathing exercises, walks in nature, and eliminating unnecessary stressors all count.', research:'Strongly supported — multiple longitudinal studies link maternal cortisol levels in weeks 1–8 to infant temperament and stress reactivity'},
+    {icon:'💊', label:'Folic Acid Window', desc:'The neural tube closes between weeks 3 and 6. This is the most time-sensitive nutritional window of the entire pregnancy. Consistent folic acid intake right now has a direct, irreversible impact on spinal cord and brain formation.', research:'Gold standard evidence — folic acid reduces neural tube defects by up to 70%'},
+    {icon:'🌿', label:'Toxin Elimination', desc:'Remove alcohol, tobacco smoke (including secondhand), cleaning chemicals with strong fumes, and any unnecessary medications from the home environment. The embryo has no detoxification capacity yet — what enters the mother\'s bloodstream reaches the baby directly.', research:'Established teratology — first trimester is the highest-sensitivity window for environmental exposures'}
+  ],
+  birthPrep:'Begin thinking about what kind of birth experience you want. Hospital, birth center, or home birth each have different philosophies and protocols. Starting the conversation early means the most options remain open.',
+  milestones:['Implantation complete','Placenta forming','Neural tube beginning to close']
+},
+
+5: {
+  emoji:'🫐', sizeName:'Blueberry', sizeEmoji:'🫐', lengthCm:0.4, weightG:0,
+  development:['The heart is beating — approximately 100 to 160 beats per minute','The brain, spinal cord, and major organ systems are beginning to take shape simultaneously','Tiny arm and leg buds are emerging from the embryonic disc','The face is forming with small indentations where the eyes and nostrils will develop'],
+  momFeels:['Morning sickness may begin — it can occur at any time of day, not just morning, and is a sign of healthy hCG','Breast tenderness and fullness that can be significant','Frequent urination as the uterus and blood volume begin expanding','Food aversions are neurologically driven protective responses — not preferences she can override'],
+  mentalHealth:'Mood swings in early pregnancy are driven by real hormonal shifts — progesterone and hCG are surging, and the brain is genuinely adjusting its chemistry. These are not overreactions. They deserve to be received with patience and understanding from both partners.',
+  nutrition:[
+    {icon:'🍌', name:'Vitamin B6', detail:'10–25 mg three times daily has strong clinical support for reducing nausea — bananas, potatoes, and chicken are the best food sources'},
+    {icon:'🫚', name:'Ginger', detail:'250 mg capsules 4x daily, ginger tea, or ginger chews — multiple clinical trials confirm significant nausea reduction comparable to some medications'},
+    {icon:'💊', name:'Folic Acid', detail:'800 mcg daily — the neural tube is still closing this week. Consistency is everything'},
+    {icon:'🍊', name:'Vitamin C', detail:'85 mg/day from citrus and berries — enhances iron absorption and supports the immune system during a period of high demand'}
+  ],
+  exercise:'Light walking and prenatal yoga are excellent. Keep intensity conversational — you should be able to speak full sentences during movement. Begin or maintain pelvic floor work daily.',
+  sleep:'Fatigue at this stage is intense and biologically real. Short naps are genuinely restorative. Keeping crackers at the bedside and eating a few before getting up in the morning can significantly reduce morning nausea.',
+  appointments:['First prenatal appointment typically scheduled around now','Full blood panel and workup ordered','Prenatal vitamin regimen confirmed with provider'],
+  apptDetail:['A transvaginal ultrasound may be used this early to confirm the heartbeat and gestational age. Hearing the heartbeat for the first time at this appointment is one of the most powerful moments of early pregnancy.'],
+  partnerDeep:{
+    physical:[
+      {icon:'🍽️', act:'Master 5 bland, nutritious meals she can tolerate', why:'Nausea makes eating feel impossible, but the baby needs consistent nutrition. Learning to make oatmeal, rice dishes, avocado toast, plain proteins, and broth-based soups — and having them ready without her asking — is a concrete act of care with a direct nutritional benefit to the baby.'},
+      {icon:'💆', act:'Daily foot and leg massage, 10 minutes each evening', why:'Blood volume is already increasing. Leg massage improves circulation, reduces the fatigue she feels in her lower body, and the physical touch releases oxytocin in both of you — which is directly beneficial to the pregnancy.'},
+      {icon:'🌿', act:'Clear the home of chemical triggers', why:'Her smell sensitivity is a biological response that protects the embryo from toxins. Go through cleaning products, air fresheners, cologne, and anything with strong artificial scent. Replace with unscented alternatives. This is not inconvenient — it is protective.'}
+    ],
+    psychological:[
+      {icon:'🧘', act:'Do a 5-minute breathing practice together before sleep', why:'Box breathing or 4-7-8 breathing practiced together lowers cortisol in both partners. What reduces her stress biochemically reduces the stress hormone load her bloodstream delivers to the baby.'},
+      {icon:'📚', act:'Read one thing about fetal development every week and share it with her', why:'When both partners are educated together, the pregnancy becomes a shared intellectual and emotional experience rather than something happening to one person while the other watches.'},
+      {icon:'🎯', act:'Name and eliminate her top three stress sources', why:'Ask her directly: what are the three things making you most anxious right now? Then take concrete action on at least one of them. Stress reduction in weeks 5–10 has measurable effects on infant neurological outcomes.'}
+    ]
+  },
+  babyBenefit:[
+    {icon:'🧘', label:'Maternal Cortisol Reduction', desc:'Cortisol freely crosses the placenta. Practices that lower maternal stress — breathing, walks, removing conflict from the home environment — directly reduce the cortisol load the developing brain is exposed to during its most sensitive formation period.', research:'Well established — maternal anxiety in weeks 4–8 correlates with altered fetal stress axis development'},
+    {icon:'🎵', label:'Maternal Voice and Calm', desc:'While the baby cannot hear yet, the mother\'s voice creates vibrations through her body that the embryo experiences. More importantly, a calm, regulated mother produces a different hormonal environment than an anxious one. Singing, humming, and speaking gently to the pregnancy already matters.', research:'Emerging evidence on intrauterine vibrotactile experience before auditory development'},
+    {icon:'🥗', label:'Nutrient Timing — First Trimester Window', desc:'The organs forming right now — brain, heart, spinal cord — require specific nutrients at specific windows. Folic acid, choline, DHA, and iron in the first trimester have outsized effects that no amount of supplementation later can fully replace. This window is irreplaceable.', research:'Strong clinical evidence across all four nutrients for first trimester developmental impact'}
+  ],
+  birthPrep:'Research your birth location options. Visit hospital and birth center websites, read their philosophies, and begin thinking about what kind of environment you want to bring your child into.',
+  milestones:['Heart beating at 100–160 bpm','Brain and organ systems forming','Arm and leg buds emerging']
+},
+
+9: {
+  emoji:'🍇', sizeName:'Grape', sizeEmoji:'🍇', lengthCm:2.3, weightG:2,
+  development:['Your baby officially becomes a fetus this week — the embryonic stage is complete','All essential organs are formed and development now shifts to growth, refinement, and function','The baby can bend its elbows and knees — the first coordinated movements','Eyelids are fused shut to protect the developing retinas — they will remain closed until around week 26'],
+  momFeels:['Many women notice nausea beginning to ease slightly after week 9 as hCG plateaus','The uterus is now palpable just above the pubic bone','Vivid, intense dreams are extremely common in pregnancy and completely normal','Some women notice their waistline thickening even before a visible bump appears'],
+  mentalHealth:'The transition into parenthood is one of the most identity-shifting experiences a person goes through. It is completely normal to feel both deeply excited and genuinely uncertain. Both are valid. Both can exist at the same time.',
+  nutrition:[
+    {icon:'🐟', name:'DHA Omega-3', detail:'200–300 mg daily from salmon, sardines, or an algae-based supplement — directly fuels the brain development that is accelerating this week'},
+    {icon:'🥚', name:'Choline', detail:'450 mg/day — eggs and lean meat are the best sources. Choline is critical for brain and spinal cord development and is often under-consumed even with a prenatal vitamin'},
+    {icon:'🌰', name:'Zinc', detail:'11 mg/day — pumpkin seeds, beef, chickpeas, cashews. Zinc drives cell division which is occurring at extraordinary rates this week'},
+    {icon:'🌾', name:'Complex Carbohydrates', detail:'Whole grains, oats, sweet potatoes — keep blood sugar steady and provide sustained energy. Blood sugar instability worsens nausea significantly'}
+  ],
+  exercise:'Prenatal yoga is outstanding at this stage. It builds the flexibility and breathing techniques you will use in labor, and the community of other pregnant women is genuinely valuable. Pelvic floor work daily — 3 sets of 10 holds.',
+  sleep:'A small high-protein snack before bed (peanut butter on toast, a hard-boiled egg) can stabilize blood sugar overnight and reduce morning sickness severity. Left-side sleeping whenever comfortable.',
+  appointments:['NIPT blood draw ideal between weeks 9–13 — a simple blood test, no risk to the baby','Nuchal translucency ultrasound scheduled for weeks 11–14','Discuss genetic counseling if applicable'],
+  apptDetail:['The NIPT screens for chromosomal conditions including Down syndrome with very high accuracy from a maternal blood draw. Results typically return in 1–2 weeks. It is optional but provides significant information early.'],
+  partnerDeep:{
+    physical:[
+      {icon:'💆', act:'Learn prenatal massage — specifically the lower back and hips', why:'Round ligament pain and hip tension begin in the first trimester and intensify throughout pregnancy. A partner who can competently address these areas with massage provides genuine physical relief. Look up prenatal massage techniques this week — it takes 20 minutes to learn the basics and she will feel the difference immediately.'},
+      {icon:'🏃', act:'Walk with her every evening, even 15 minutes', why:'Gentle walking after dinner stabilizes blood sugar, reduces nausea, supports cardiovascular health, and the oxytocin released during physical activity together strengthens your bond. This becomes one of the most important rituals of the pregnancy if you start it now.'},
+      {icon:'🛏️', act:'Optimize her sleep environment tonight', why:'Get a pregnancy pillow if you do not have one. Lower the thermostat — body temperature runs high in pregnancy. Remove anything from the bedroom that produces light or sound. Her sleep quality directly affects fetal cortisol exposure and her daytime nausea levels.'}
+    ],
+    psychological:[
+      {icon:'🗣️', act:'Have the fear conversation — not just the excitement one', why:'Ask her directly: what are you most afraid of about this pregnancy, about birth, about becoming a mother? Then listen completely. Do not reassure immediately — just receive. Being a safe container for her fears is one of the most psychologically valuable things a partner can provide.'},
+      {icon:'📋', act:'Take full ownership of the appointment logistics', why:'Know the appointment dates, what each one is testing, and what questions need to be asked. When she does not have to manage the administrative layer of pregnancy, her mental load decreases measurably. Research what the NIPT screens for before the appointment so you can engage meaningfully.'},
+      {icon:'🧠', act:'Read about the fetal-maternal stress connection', why:'Understanding that her emotional state is a biological input into the baby\'s development transforms how you think about your role. You are not just supporting her — you are directly shaping the neurological environment your child develops in.'}
+    ]
+  },
+  babyBenefit:[
+    {icon:'🧘', label:'Stress Hormone Reduction — Peak Window', desc:'Weeks 8–12 are a critical period for fetal hypothalamic-pituitary-adrenal axis development — the system that will govern your child\'s stress responses for life. Maternal cortisol during this window has lasting effects. Daily stress reduction practices are not optional wellness activities right now — they are developmental interventions.', research:'Strong longitudinal evidence — prenatal maternal stress in weeks 8–12 linked to child anxiety and stress reactivity at age 6'},
+    {icon:'🎵', label:'Begin Talking to the Baby', desc:'The auditory system begins forming this week. While hearing is not functional yet, establishing the habit of speaking to and acknowledging the baby creates a ritual that deepens parental bond, reduces maternal anxiety, and prepares you both for the voice recognition research that begins mattering at week 18.', research:'Supported — prenatal bonding behaviors correlate with postnatal attachment quality'},
+    {icon:'🥗', label:'Choline Loading Window', desc:'The brain\'s memory centers (hippocampus) are forming right now and choline is their primary construction material. Research from Cornell University shows that higher maternal choline intake during fetal brain development produces offspring with significantly improved memory function. Two eggs daily is the simplest way to reach therapeutic levels.', research:'Cornell University research — high choline intake linked to improved offspring memory and information processing'}
+  ],
+  birthPrep:'Begin researching doulas. Interview at least two or three before deciding. A doula who has attended hundreds of births brings knowledge, calm, and advocacy that transforms the labor experience for both partners.',
+  milestones:['Fetus milestone — embryo stage complete','All organs formed','Elbows and knees bending']
+},
+
+12: {
+  emoji:'🍋', sizeName:'Lime', sizeEmoji:'🍋', lengthCm:5.4, weightG:14,
+  development:['All major organs are formed and functioning together as an integrated system','The baby can open and close its fists — reflexes are becoming coordinated','The thyroid gland is producing hormones independently','The face is fully formed and looks unmistakably like a baby — eyes, nose, and mouth in their permanent positions'],
+  momFeels:['Many women feel dramatically better this week as the placenta takes over hormone production','The uterus rises above the pubic bone — the belly will become visible more consistently','Emotional relief as the first trimester ends and miscarriage risk drops significantly','A genuine sense of exhale — many couples describe week 12 as the first time the pregnancy feels celebratory'],
+  mentalHealth:'The end of the first trimester is a psychological milestone as much as a medical one. Allow yourselves to celebrate. The work of these first 12 weeks — physical, emotional, nutritional — has been real and significant. Acknowledge it together.',
+  nutrition:[
+    {icon:'🥛', name:'Calcium', detail:'1,000 mg/day — the skeleton is mineralizing rapidly. Your baby takes from your bones if diet falls short, affecting your long-term bone density'},
+    {icon:'💊', name:'Magnesium', detail:'350 mg/day — reduces leg cramps, supports sleep quality, and regulates blood pressure. Almonds, dark chocolate, spinach, and black beans are the best sources'},
+    {icon:'🌿', name:'Iron', detail:'27 mg/day — blood volume expansion is ongoing. If your provider checks hemoglobin, aim for 11 g/dL or above'},
+    {icon:'🥦', name:'Vitamin K', detail:'Leafy greens daily — supports blood clotting for eventual delivery and bone metabolism for both mother and baby throughout pregnancy'}
+  ],
+  exercise:'The second trimester is approaching and many women call it the best weeks of pregnancy for physical activity. Establish your exercise habit now while energy is returning. Swimming, prenatal yoga, and walking are all excellent.',
+  sleep:'Left-side sleeping with a pregnancy pillow is now the recommended standard. If heartburn is disrupting sleep, elevate the head of the bed slightly and avoid eating within 2 hours of lying down.',
+  appointments:['NT scan (nuchal translucency ultrasound) — weeks 11–14','First trimester screening bloodwork results reviewed with your provider','Many couples share the pregnancy news after this appointment'],
+  apptDetail:['The NT scan measures fluid at the back of the baby\'s neck. Combined with NIPT blood results, it gives your provider a comprehensive picture. This ultrasound at week 12 is often the first time parents clearly see a baby — with a visible face, hands, and active movement.'],
+  partnerDeep:{
+    physical:[
+      {icon:'💆', act:'Establish a weekly full-body massage practice', why:'Research on massage during pregnancy shows reduced cortisol, reduced depression scores, reduced leg and back pain, and improved sleep. This is not a luxury — it is a clinically studied intervention. Learn to do the upper back, lower back, hips, legs, and feet. One hour per week has measurable outcomes.'},
+      {icon:'🍳', act:'Take complete ownership of nutrition planning and preparation', why:'Now that nausea is easing, food becomes genuinely important. Research what she needs each week — the nutritional demands change as the baby grows. Preparing meals with the right nutrients is a concrete act of fetal investment. You are literally building your child with what she eats.'},
+      {icon:'🚶', act:'Commit to a shared daily walk — non-negotiable', why:'Couples who walk together daily during pregnancy report higher relationship satisfaction, lower maternal anxiety, and the mother experiences better sleep and lower blood pressure. Make this the one thing that does not get cancelled. It takes 20 minutes and the compounding benefit over 28 more weeks is significant.'}
+    ],
+    psychological:[
+      {icon:'🎯', act:'Define your postpartum support plan together this week', why:'The first 6 weeks postpartum are the most vulnerable period for maternal mental health. Planning who will help, who will bring food, how responsibilities will be divided, and what your individual needs are — done now, before birth — dramatically reduces postpartum anxiety and conflict.'},
+      {icon:'📝', act:'Write a letter to your child together', why:'Sitting together and writing what you feel about this baby, what you hope for them, and who you are as people right now creates a psychological anchor for the pregnancy. Many parents read these letters on the child\'s first birthday. The act of writing it together deepens co-parenting identity before the child arrives.'},
+      {icon:'🧘', act:'Establish a nightly 5-minute check-in ritual', why:'Ask three questions each night: How is your body? How is your mind? What do you need tomorrow? This structured check-in, done consistently, prevents the emotional drift that happens when partners assume rather than ask. Sustained through pregnancy, it becomes one of the most valuable relationship practices you will have.'}
+    ]
+  },
+  babyBenefit:[
+    {icon:'🎵', label:'Begin Auditory Stimulation Practice', desc:'The auditory system is forming now and will be functional by week 18. This is the time to establish the music, voices, and sounds that will become familiar to your baby. Choose music you genuinely love and play it consistently — the baby will recognize it after birth. Research shows newborns prefer and are calmed by music heard in utero.', research:'Well documented — DeCasper & Spence research lineage; newborns show measurable preference for prenatal auditory experiences'},
+    {icon:'🗣️', label:'Partner Voice Imprinting Begins', desc:'Begin speaking to the baby directly every day — both partners. Use the same phrases, songs, or words consistently. At birth, newborns turn toward familiar voices and show measurable recognition. The father\'s voice in particular, being different in pitch and timbre from the mother\'s, creates a distinct neurological imprint the baby will respond to at birth.', research:'Confirmed — newborns distinguish and prefer voices heard prenatally; partner voice imprinting is well supported'},
+    {icon:'🧘', label:'Mindfulness Practice for Fetal Brain Development', desc:'Maternal mindfulness meditation during pregnancy has been shown to reduce fetal cortisol exposure and is associated with improved infant self-regulation at 6 months. Even 10 minutes of guided breathing daily by both parents creates a measurable shift in the hormonal environment. Apps like Insight Timer have free prenatal meditation tracks.', research:'Multiple RCTs support prenatal mindfulness reducing maternal cortisol and improving neonatal stress regulation'}
+  ],
+  birthPrep:'Enroll in a childbirth education class this week. The best ones fill up months in advance. Look for programs that cover all birth scenarios, evidence-based pain management, partner coaching roles, and early postpartum.',
+  milestones:['End of first trimester','All organs functioning','Miscarriage risk significantly lower','Visible on ultrasound as unmistakably human']
+},
+
+16: {
+  emoji:'🥑', sizeName:'Avocado', sizeEmoji:'🥑', lengthCm:11.6, weightG:100,
+  development:['The baby can make facial expressions — frowning, squinting, and grimacing as facial muscles develop','The skeleton is hardening from cartilage to bone throughout the entire body','Fine hair called lanugo begins covering the body, regulating temperature and protecting the skin','The circulatory and urinary systems are fully functioning — the baby processes amniotic fluid and produces urine'],
+  momFeels:['Second trimester energy is real — many women feel genuinely like themselves again','Quickening — the first baby movements — may begin this week, often felt as bubbles or soft flutters','The pregnancy glow is real: increased blood flow and estrogen elevate skin luminosity and hair growth','Back pain may begin as the center of gravity shifts — posture and core engagement become important daily practices'],
+  mentalHealth:'Feeling the baby move for the first time is often a profound emotional shift. The abstract becomes undeniably real. Both parents may experience a deepening of their bond to the baby around this time — and a shift in the psychological reality of becoming parents.',
+  nutrition:[
+    {icon:'🐟', name:'DHA Omega-3', detail:'200–300 mg/day minimum — the brain is entering its most active development phase and DHA is its primary structural fat. Salmon twice weekly or a quality algae supplement'},
+    {icon:'🥩', name:'Iron', detail:'27 mg/day — blood volume is surging. Unusual fatigue, pale gums, and shortness of breath on minimal exertion are signs your iron may need attention'},
+    {icon:'🌾', name:'Fiber', detail:'28 grams daily — constipation is a consistent complaint in the second trimester. Whole grains, legumes, prunes, and pears are your most effective tools. Hydration alongside fiber is essential'},
+    {icon:'🧂', name:'Iodine', detail:'220 mcg/day — critical for thyroid function and baby\'s brain development. Found in dairy, seafood, and iodized salt. Confirm your prenatal vitamin contains iodine'}
+  ],
+  exercise:'The second trimester sweet spot for exercise. Prenatal strength training with appropriate modifications, swimming, walking, and yoga are all excellent. Core work shifts to functional movements — no traditional crunches. Pelvic floor work every single day.',
+  sleep:'As the belly grows, a full body pillow becomes essential. Left side, pillow between knees, pillow under belly. If heartburn wakes you, elevate the head of the bed a few inches. Leg cramps can begin now — magnesium glycinate at bedtime reduces frequency significantly.',
+  appointments:['Anatomy ultrasound scheduled for weeks 18–20 — the most comprehensive scan of the pregnancy','Quad screen blood test offered — screens for neural tube defects and chromosomal conditions','Discuss whether you want to know the sex before the anatomy scan'],
+  apptDetail:['The anatomy scan evaluates every organ, the placenta location, amniotic fluid, and growth measurements. It typically takes 30–45 minutes and is the most visually detailed look at your baby during pregnancy. This is a profound appointment — be fully present for it.'],
+  partnerDeep:{
+    physical:[
+      {icon:'💆', act:'Learn and practice pregnancy-specific massage — lower back, sacrum, hips, and legs', why:'Back pain and round ligament pain begin intensifying this trimester. The sacrum and lower back carry enormous load as the center of gravity shifts. A partner who addresses these areas specifically — not just generally rubbing — provides relief that no other person in her life can. Spend 15 minutes before bed targeting the lower back and hips every other day.'},
+      {icon:'🏊', act:'Go to the pool together if access is available', why:'Weightlessness in water provides relief from physical pressure that nothing else replicates. Partners who swim or do water walking with their pregnant partner report higher connection and she experiences reduced back pain, reduced swelling, and improved sleep on those days. Even once a week is meaningful.'},
+      {icon:'🧘', act:'Do the breathing practice together before every appointment', why:'Prenatal appointments carry ambient anxiety — waiting rooms, unfamiliar results, new information. Arriving having done 5 minutes of box breathing together means her cortisol is lower when she enters the exam room, which affects how her body and the baby respond to the stress of being examined.'}
+    ],
+    psychological:[
+      {icon:'👐', act:'Place your hands on her belly and speak to the baby every single day', why:'This is not symbolic. The father\'s voice at consistent times creates an auditory imprint the baby is now capable of processing. Newborns at birth respond with measurable physiological calming to voices they heard consistently in utero. Daily is not optional — frequency is what creates the pattern recognition.'},
+      {icon:'🔬', act:'Research the anatomy scan together before you go', why:'Understanding what the technician is looking at — heart chambers, brain hemispheres, spine, kidneys — means you are present and engaged rather than watching a screen you do not understand. Parents who understand what they are seeing at the anatomy scan report it as one of the most meaningful experiences of the pregnancy.'},
+      {icon:'🌿', act:'Create a weekly stress audit and act on it', why:'Every Sunday, ask: what caused her the most stress this week and what one thing can I eliminate or absorb next week? Over time this practice identifies patterns — certain people, certain situations, certain times of day — and you can systematically reduce her chronic stress load. The cumulative cortisol reduction benefits your baby directly.'}
+    ]
+  },
+  babyBenefit:[
+    {icon:'🎵', label:'Music Exposure — Hearing is Now Active', desc:'The auditory system is functional. This is when music exposure becomes a real developmental input. Play music at a moderate volume against the belly for 15–20 minutes daily. Choose consistent pieces — the baby will develop recognition of these specific pieces and show calming responses to them after birth. Classical, ambient, or any music you genuinely love all work.', research:'Multiple studies confirm prenatal music exposure produces newborn recognition and calming — Hepper 1991, Granier-Deferre 2011'},
+    {icon:'🗣️', label:'Reading Aloud — Story Recognition at Birth', desc:'Choose a short book and read it to the belly at the same time each day. Dr. Seuss, poetry, or anything with rhythm and repetition works well. Research by DeCasper & Spence showed that newborns sucked differently on a pacifier to hear a story read during pregnancy versus a novel story. Your baby will know this book at birth.', research:'DeCasper & Spence 1986 — one of the most replicated findings in prenatal learning research'},
+    {icon:'🧘', label:'Binaural Beats — Alpha Wave Exposure', desc:'Alpha wave binaural beats (8–12 Hz) played through speakers near the belly during the mother\'s relaxation periods appear to support the relaxation response and reduce maternal cortisol. While direct fetal neurological benefit research is still emerging, the indirect benefit through maternal stress reduction is well supported. Use speakers, not headphones near the belly.', research:'Emerging — alpha binaural beats shown to reduce maternal cortisol; indirect fetal benefit through hormonal environment'}
+  ],
+  birthPrep:'Pre-register at your hospital or birth center. Research your insurance coverage for the delivery, hospital stay, and newborn care. Confirm your pediatrician choice — the good ones have waitlists.',
+  milestones:['Hearing active','Facial expressions','Skeleton hardening','First movements felt']
+},
+
+20: {
+  emoji:'🍌', sizeName:'Banana', sizeEmoji:'🍌', lengthCm:25.0, weightG:300,
+  development:['The anatomy scan can reveal the sex of the baby','The baby swallows amniotic fluid and is producing meconium — its first stool, which passes after birth','All five senses are developing — the baby hears your voices, responds to light, and tastes the amniotic fluid','Vernix caseosa, a waxy protective coating, is forming over the skin to protect it from the amniotic fluid'],
+  momFeels:['Kicks, rolls, and jabs are now unmistakable — partners can often feel them from outside','Heartburn and indigestion are very common as the uterus compresses the stomach upward','The growing belly affects sleep positioning — a full pregnancy pillow becomes essential','Leg cramps, especially at night, affect many women and are usually related to magnesium and calcium levels'],
+  mentalHealth:'The halfway point of pregnancy is a powerful psychological marker. Take time together to recognize how far you have both come. Many couples find this a natural moment to reconnect, celebrate, and deepen their shared preparation for parenthood.',
+  nutrition:[
+    {icon:'🦴', name:'Calcium + Vitamin D', detail:'These work together — calcium builds bones, vitamin D ensures absorption. 1,000 mg calcium and 600 IU vitamin D daily, with sun exposure supplementing when possible'},
+    {icon:'🥩', name:'Protein', detail:'75–100 grams daily — muscle, organ tissue, and the placenta itself are protein-dependent. Eggs, legumes, Greek yogurt, chicken, and fish are your best sources'},
+    {icon:'🫐', name:'Antioxidants', detail:'Colorful produce fights inflammation and supports placental health. 5–7 servings daily — variety of colors matters more than quantity of any single food'},
+    {icon:'💧', name:'Water', detail:'10–12 cups daily minimum — amniotic fluid is completely replenished every 3 hours and comes entirely from maternal hydration'}
+  ],
+  exercise:'This is typically the peak of pregnancy fitness capacity. Prenatal strength training, swimming, Pilates modified for pregnancy, and walking are all excellent. Begin incorporating labor preparation positions: hands-and-knees, wide-legged squats, and side-lying stretches.',
+  sleep:'Full pregnancy pillow is essential — left side, support under belly and between knees. If woken by leg cramps, flex the foot upward toward the shin and massage the calf. Magnesium glycinate at bedtime reduces cramp frequency significantly.',
+  appointments:['Anatomy ultrasound — the most thorough examination of your baby','Sex revealed if desired','Placenta location confirmed — important for the remainder of the pregnancy'],
+  apptDetail:['The anatomy scan evaluates brain, heart, spine, kidneys, stomach, limbs, face, and umbilical cord insertion. Growth measurements confirm the baby is on track. Bring your partner — this is one of the most memorable appointments of the entire pregnancy.'],
+  partnerDeep:{
+    physical:[
+      {icon:'💆', act:'Full prenatal massage, one hour, every week from this point forward', why:'The second half of pregnancy brings compounding physical load — back pain, pelvic pressure, leg fatigue, and disrupted sleep all accumulate. A weekly full massage is not a treat — it is maintenance. Cortisol, pain, and sleep quality are all measurably improved with consistent massage. Learn the techniques. This is your primary physical contribution from week 20 to delivery.'},
+      {icon:'🍳', act:'Take full responsibility for three meals a day', why:'Her stomach is compressed, her energy is divided, and her nutritional needs are at their highest. The baby needs 75–100 grams of protein, consistent calcium, iron, and DHA every single day. If she is managing food on top of everything else her body is doing, that is energy taken from the pregnancy. Own this completely.'},
+      {icon:'🏊', act:'Create a physical relief ritual for the end of every day', why:'Leg elevation for 15–20 minutes with a pillow under the calves reduces swelling and improves venous return. Combine it with gentle foot massage. Done consistently every evening, this becomes one of the most appreciated acts of care of the entire second trimester.'}
+    ],
+    psychological:[
+      {icon:'🗣️', act:'Read aloud to the belly every night — both of you', why:'This is one of the highest-impact developmental interventions available to you. Choose the same short book or passage and read it consistently. At birth, your baby will recognize this story. The practice also deepens your bond with the baby and with each other — parents who engage in regular prenatal interaction report higher postnatal attachment.'},
+      {icon:'🧠', act:'Discuss your individual fears about parenthood honestly', why:'Research on couples who discuss birth and parenting fears openly before birth shows higher relationship satisfaction postpartum and lower rates of paternal depression. The conversation is not a problem to solve — it is a connection to make. What are you afraid of? What does she need to hear from you?'},
+      {icon:'🎯', act:'Define what the first two weeks home will look like in specific detail', why:'Ambiguity postpartum generates conflict. Who sleeps when? Who handles which tasks? Who has access to the home? Decisions made now in calm conversation are dramatically better than decisions made in exhaustion with a newborn. This planning is a psychological gift to your future selves.'}
+    ]
+  },
+  babyBenefit:[
+    {icon:'🎵', label:'Consistent Music Programming', desc:'Play the same 2–3 pieces of music against the belly daily. The baby has now heard these pieces enough times to show measurable recognition at birth. Pieces with clear melodic structure and moderate tempo are most effective for auditory memory formation. This is not background music — it is intentional exposure at close range, consistently timed.', research:'Granier-Deferre et al. — prenatal musical exposure produces postnatal heart rate deceleration indicating recognition'},
+    {icon:'🗣️', label:'Partner Voice Daily Practice', desc:'The father should speak directly to the belly for at least 5 minutes daily at a consistent time. Use the same phrases, sing the same song, or tell the same short story. At birth, newborns turn toward and show calming responses to the specific voice patterns they heard most frequently. Consistency over the next 20 weeks builds a powerful recognition response.', research:'Confirmed across multiple studies — paternal prenatal voice exposure produces measurable neonatal recognition'},
+    {icon:'💡', label:'Light Stimulation Begins', desc:'The baby can now perceive bright light through the abdominal wall as a reddish glow. Shining a bright flashlight against the belly in a darkened room and moving it slowly will produce a fetal response — movement toward or away from the light. This is not just interesting — it exercises the developing visual neural pathways.', research:'Fetal response to transabdominal light confirmed from approximately week 20 onward'}
+  ],
+  birthPrep:'Finalize your childbirth education enrollment. Begin your birth preferences document. Research the 5-1-1 rule for hospital arrival timing: contractions 5 minutes apart, lasting 1 minute, for 1 hour.',
+  milestones:['Halfway point','All senses developing','Baby hears your voice clearly','Sex often revealed at anatomy scan']
+},
+
+28: {
+  emoji:'🥦', sizeName:'Head of broccoli', sizeEmoji:'🥦', lengthCm:37.0, weightG:1000,
+  development:['The baby can blink — eyelids have opened and the baby practices opening and closing its eyes in response to light','REM sleep cycles are present — your baby is dreaming','The brain is forming gyri, the grooves and ridges that dramatically increase its surface area and cognitive capacity','The lungs are practicing breathing movements, inhaling and exhaling amniotic fluid to build the muscle strength needed for the first breath'],
+  momFeels:['Third trimester begins — fatigue often returns as the baby\'s growth demands intensify','Shortness of breath as the uterus pushes upward on the diaphragm','Braxton Hicks contractions may become more frequent and noticeable','The nesting instinct may emerge — a powerful, biologically-driven impulse to organize, prepare, and create a ready home'],
+  mentalHealth:'The third trimester brings a shift in psychological preparation. Birth is real and approaching. Couples who discuss fears openly — rather than managing them privately — navigate labor with greater resilience. A session with your OB specifically focused on what to expect in labor is worth requesting.',
+  nutrition:[
+    {icon:'🐟', name:'DHA Omega-3', detail:'The brain complexity is accelerating — maintain 200–300 mg daily minimum. This is the peak period of fetal brain growth and DHA is its primary structural fat'},
+    {icon:'🥩', name:'Iron', detail:'Providers often recheck hemoglobin in the third trimester. Iron deficiency affects energy, sleep, and immune function. Consistent iron-rich foods and your prenatal vitamin are non-negotiable'},
+    {icon:'🫐', name:'Vitamin C', detail:'Supports collagen synthesis as skin continues to stretch and enhances iron absorption. Pair vitamin C with every iron-containing meal for maximum effect'},
+    {icon:'💧', name:'Hydration', detail:'10–12 cups daily. Dehydration triggers Braxton Hicks and can affect amniotic fluid levels. Monitor urine color — pale yellow is the target'}
+  ],
+  exercise:'Regular movement in the third trimester is linked to shorter labors and easier recoveries. Walking is the most sustainable. Begin incorporating specific labor preparation positions: hands-and-knees for 15 minutes daily encourages optimal baby positioning. Prenatal yoga with labor preparation focus is excellent.',
+  sleep:'Fragmented sleep is now normal. Focus on total rest rather than uninterrupted hours. Left-side with full body pillow support. Warm (not hot) bath before bed improves sleep quality. Accept the disruption and rest between wakings.',
+  appointments:['Rhogam injection if Rh negative — given at 28 weeks, critically important','Hemoglobin recheck — iron often dips this trimester','Appointments move to every two weeks from here','Group B strep test coming at weeks 35–37'],
+  apptDetail:['If Rh negative, the Rhogam injection at 28 weeks prevents your immune system from developing antibodies that could affect this or future pregnancies. It is safe, important, and standard. Ask your provider to explain why if you want to understand the mechanism — it is worth knowing.'],
+  partnerDeep:{
+    physical:[
+      {icon:'💆', act:'Give a full prenatal massage every single evening — not occasionally', why:'The third trimester brings compound physical load that does not let up. Her back, hips, pelvis, legs, and feet are under constant pressure. A daily 20-minute massage — lower back, sacrum, hips, calves, feet — is the highest-impact physical act available to you. Research from the Touch Research Institute shows prenatal massage reduces cortisol, improves sleep, and reduces preterm birth risk.'},
+      {icon:'🧘', act:'Practice labor support positions together twice a week', why:'Counter-pressure on the sacrum during contractions is one of the most effective pain management techniques in labor. The double hip squeeze, sacral pressure, and supported squatting all require a partner who has practiced them. Do not learn these in the delivery room — practice them now so they are instinct under pressure.'},
+      {icon:'🛌', act:'Take the night responsibilities for anything outside of feeding', why:'Her sleep is fractured by physical discomfort and frequent urination. Every time she has to get up for something you could have handled — water, a snack, adjusting the room, getting the pillow — is a cortisol event. Anticipate her needs before she has to ask. Be up before she is.'}
+    ],
+    psychological:[
+      {icon:'🎯', act:'Go through the birth preferences document together and know it completely', why:'In labor, she will not be able to advocate for herself at every moment. You are her voice. Know her preferences for pain management, interventions, skin-to-skin, cord clamping, and who is in the room. Practice saying them out loud so when the moment comes, it is natural rather than searched for.'},
+      {icon:'🧠', act:'Research the physiology of labor so you understand what is happening', why:'Fear in a support person transfers directly to the laboring partner. Partners who understand what each stage of labor means — why contractions intensify, what transition looks like, what is normal — remain calm under pressure. Read one evidence-based birth book together this week.'},
+      {icon:'🗣️', act:'Tell her specifically what you are prepared to do in labor', why:'Not generally. Specifically. "I will press on your sacrum through every contraction." "I will not leave the room." "I will not eat in front of you." Specific commitments reduce her pre-labor anxiety measurably. She needs to know you are prepared, not just willing.'}
+    ]
+  },
+  babyBenefit:[
+    {icon:'🎵', label:'Music Recognition is Now Deep', desc:'The baby has been hearing consistent music for 10+ weeks. This is the time to introduce specific pieces you want associated with calm and sleep after birth — what you play consistently now is what you will play in the bassinet to trigger sleep association later. Lullabies, ambient music, or any consistent calm music establishes a postnatal sleep cue before birth.', research:'Confirmed postnatal recognition and calming response to prenatal music — multiple replication studies'},
+    {icon:'💡', label:'Light and Shadow Play', desc:'The baby tracks light through the abdominal wall. A gentle flashlight moved slowly across the belly in a dark room produces movement responses. This exercises developing visual neural pathways. The response you see is your baby seeing. Do this for 5 minutes a few times a week.', research:'Fetal photic response well documented — transabdominal light produces measurable motor and heart rate responses'},
+    {icon:'🧘', label:'Coherent Breathing Practice Together', desc:'Heart Rate Variability (HRV) coherence — achieved through slow, rhythmic breathing at 5–6 breaths per minute — produces a measurable shift in maternal autonomic nervous system state that crosses to the fetus through hormonal and heart rhythm pathways. Both partners doing this together for 10 minutes daily produces compounding benefit. The HeartMath coherence technique is the most researched protocol.', research:'HeartMath Institute research — maternal HRV coherence practice influences fetal heart rhythm patterns'}
+  ],
+  birthPrep:'Pack the hospital bag. Know the route to the hospital including night parking. Discuss with your provider exactly what signs indicate it is time to go — every situation is different and knowing your specific thresholds reduces panic when the moment comes.',
+  milestones:['Third trimester begins','Baby dreams — REM sleep active','Eyes open and light-responsive','Brain complexity accelerating']
+},
+
+36: {
+  emoji:'🥬', sizeName:'Head of romaine', sizeEmoji:'🥬', lengthCm:47.0, weightG:2600,
+  development:['The baby is considered early term at 37 weeks — organs are mature and ready for the outside world','Fat deposits are rounding out the face and limbs — the lean translucent appearance has given way to a full baby','The immune system is receiving antibodies through the placenta at peak rate — the baby is being immunologically prepared for the world it is about to enter','The digestive system is mature and waiting for the first feeding'],
+  momFeels:['Significant pressure deep in the pelvis as the baby descends and engages','The cervix begins to soften, thin, and possibly dilate — your provider checks this in weekly visits','Nesting instinct is often at its peak — a biological drive to prepare, organize, and complete','An emotional mixture of excitement, anxiety, and readiness that shifts hour by hour is completely normal'],
+  mentalHealth:'It is completely normal to feel both ready and afraid in these final weeks. Birth is one of the most physically and emotionally intense experiences a person goes through. Trust your preparation. Trust your body. And plan concretely for postpartum — what the first two weeks home look like matters as much as birth preparation.',
+  nutrition:[
+    {icon:'🌊', name:'Hydration', detail:'Dehydration triggers contractions. 12 cups daily minimum. Coconut water is excellent for electrolyte balance in late pregnancy'},
+    {icon:'🥗', name:'Light, frequent meals', detail:'Six small meals daily — the stomach is severely compressed. Protein and complex carbs at each meal provides sustained energy without the discomfort of fullness'},
+    {icon:'🍯', name:'Dates', detail:'6 dates daily from week 36 has been associated in multiple studies with more favorable cervical ripening and shorter early labor. Discuss with your provider — considered safe and worth trying'},
+    {icon:'🍃', name:'Red Raspberry Leaf Tea', detail:'1–2 cups daily after week 36 is recommended by many midwives to tone the uterine muscle. Discuss with your provider before beginning'}
+  ],
+  exercise:'Short walks multiple times daily encourage optimal fetal positioning. Hands-and-knees for 15–20 minutes daily helps the baby move into anterior position, which typically produces smoother, shorter labor. Pelvic circles on a birth ball are excellent for late pregnancy.',
+  sleep:'Sleep will be uncomfortable and interrupted. Accept it as preparation. Rest whenever possible even if it is not sleep. A bath before bed, magnesium glycinate, and the best pillow setup you can create all help.',
+  appointments:['Weekly OB visits begin at 36 weeks','Group B strep swab — vaginal and rectal test for GBS bacteria','Cervix check to assess effacement and dilation','Induction timeline discussed if pregnancy goes past 41 weeks'],
+  apptDetail:['Group B strep is common, harmless to healthy adults, but can affect newborns during delivery. If positive, IV antibiotics during labor virtually eliminate the risk to the baby. It is a simple, well-established protocol.'],
+  partnerDeep:{
+    physical:[
+      {icon:'💆', act:'Massage every day — no exceptions from here to birth', why:'She is carrying maximum physical load. Back, hips, pelvis, legs, feet — all under constant pressure. Daily massage at this stage is not wellness maintenance — it is active support of a person doing one of the most physically demanding things a human body can do. Make it the last thing before sleep every night without being asked.'},
+      {icon:'🏡', act:'Complete every unfinished preparation so she does not have to think about it', why:'The nesting instinct is a neurobiological drive — incomplete tasks create real psychological distress in late pregnancy. Walk through the house together and make a list. Then finish everything on it this week. The car seat installed, the bag packed, the freezer stocked, the nursery complete. Her brain needs to register that the nest is ready.'},
+      {icon:'🧘', act:'Practice labor support together every other day', why:'Counter-pressure, double hip squeeze, supported walking, the rebozo technique — these require practiced muscle memory. In active labor you will not have time to think. Your hands need to know where to go. Practice now, in the evening, for 20 minutes. Simulate contractions with a 60-second timer and actually do the techniques.'}
+    ],
+    psychological:[
+      {icon:'🛡️', act:'Become the filter between her and everything stressful', why:'In these final weeks her body is doing everything it can to prepare for labor. Every stressful interaction, every difficult conversation, every anxiety-producing situation costs energy she needs. Intercept what you can. Handle what you can. Be the calm presence between her and the world.'},
+      {icon:'🗣️', act:'Have the specific labor conversation — word for word', why:'What does she need to hear during transition? What does she not want to hear? Does she want to be coached through contractions or does she need silence? Does she want you to suggest pain medication options or does she want to make that call herself? These conversations had now prevent failures of support in the delivery room.'},
+      {icon:'💪', act:'Tell her what you see in her', why:'Not generally. Specifically. What you have watched her do over these 36 weeks — the sacrifices, the endurance, the care. Say it out loud. Verbally acknowledging what she has carried and what you have witnessed builds a psychological reserve she will draw on during labor. This is not sentiment — it is preparation.'}
+    ]
+  },
+  babyBenefit:[
+    {icon:'🎵', label:'Final Sound Imprinting', desc:'The auditory experiences of these final weeks are among the most strongly imprinted. The music played consistently, the voices heard daily, the stories read repeatedly — all of these will be immediately recognizable to your baby at birth. In the hours after delivery, familiar sounds are among the most powerful calming tools available. What you establish now is a tool you will use for months.', research:'Prenatal auditory memory is most strongly encoded in the third trimester — multiple neonatal recognition studies'},
+    {icon:'🗣️', label:'Birth Song or Phrase', desc:'Choose a specific song or phrase that you will use at birth and in the early weeks — something you will sing or say during skin-to-skin in the delivery room. Having practiced it consistently in the final weeks means the baby will respond to it with recognition and calming from the first moments of life. This is your family\'s first shared language.', research:'Newborn recognition of specific prenatal sounds produces physiological calming — confirmed across multiple paradigms'},
+    {icon:'🧘', label:'Oxytocin Optimization', desc:'Oxytocin — the hormone that drives labor and bonding — is produced in higher amounts in environments of safety, warmth, love, and low stress. In these final weeks, every moment of genuine connection between partners, every act of care, every calm and loving interaction directly supports the hormonal environment that will make labor progress and bonding happen naturally. Your relationship is a biological input into the birth.', research:'Oxytocin synthesis is directly influenced by psychosocial safety — Uvnas-Moberg research on oxytocin and birthing environment'}
+  ],
+  birthPrep:'The 5-1-1 rule: contractions 5 minutes apart, lasting 1 minute, for 1 hour — time to go. Water breaking is a signal regardless of contraction pattern. Have the bag in the car. Know your hospital entrance. Have gas in the car. Have your support people on standby with a single text they are waiting for.',
+  milestones:['Antibodies at peak transfer rate','Early term in one week','Cervix beginning to change','Body actively preparing for labor']
+},
+
+40: {
+  emoji:'🍉', sizeName:'Watermelon', sizeEmoji:'🍉', lengthCm:51.0, weightG:3400,
+  development:['Your baby is full term and fully developed in every way','The lungs are completely mature — coated with surfactant for the first independent breath','All organ systems are functioning and ready for life outside the womb','The baby is positioned deep in the pelvis, waiting for the signal to begin the journey'],
+  momFeels:['Intense pelvic pressure and the sensation that the baby could arrive any moment','Possible bloody show — pink or brown mucus as the cervix dilates — this is a positive sign','Braxton Hicks may become frequent and strong as the body rehearses','A powerful mixture of readiness, anticipation, and impatience that is completely valid'],
+  mentalHealth:'You have done everything right. You have nourished this baby, carried it through every week, learned everything you could, and prepared as completely as any parent can. Trust yourself. Trust your body. Trust the people around you. You are ready.',
+  nutrition:[
+    {icon:'💧', name:'Hydration', detail:'Critical for labor stamina — keep water nearby at all times. Coconut water during early labor provides electrolytes that sustain endurance'},
+    {icon:'⚡', name:'Light energy foods', detail:'Toast, bananas, oatmeal, dates — easily digestible carbohydrates provide fuel. Avoid large or heavy meals which slow labor'},
+    {icon:'🍯', name:'Dates', detail:'Continue 6 dates daily if you started at week 36 — the research on cervical ripening and labor duration is worth seeing through to the end'},
+    {icon:'🍵', name:'Nourishing broth', detail:'Clear broth provides sodium and hydration and is gentle during early labor. Have some ready.'}
+  ],
+  exercise:'Short walks multiple times daily remain the most beneficial movement. Pelvic circles on the birth ball, hands-and-knees positioning, and gentle hip movements all support optimal positioning and may encourage labor to begin.',
+  sleep:'Rest as much as possible before labor begins. If contractions are occurring but not yet regular, rest between them. Labor requires enormous sustained energy — every hour of rest is preparation.',
+  appointments:['Weekly OB visit with non-stress test if post-dates','Cervix check and biophysical profile','Induction discussion begins at 41 weeks if labor has not started'],
+  apptDetail:['If labor has not begun by 41–42 weeks, induction will be discussed. Modern methods are highly effective and your provider will walk you through what to expect. Most babies arrive before this conversation is needed.'],
+  partnerDeep:{
+    physical:[
+      {icon:'💆', act:'Massage every single day — morning and evening', why:'She is at maximum physical load and labor could begin at any moment. Your hands on her body every day communicate safety, presence, and care without words. It also keeps her muscles loose and her stress hormones lower. The oxytocin released during massage actually supports labor onset in a body that is ready.'},
+      {icon:'🚶', act:'Walk with her twice daily', why:'Walking in late pregnancy encourages the baby into optimal position, uses gravity to apply pressure to the cervix, and produces oxytocin — the hormone that starts labor. If she is past her due date, walking together is the most evidence-supported natural labor encouragement available.'},
+      {icon:'🛌', act:'Protect her rest completely — handle everything', why:'She needs to bank every hour of rest available before labor begins. Nothing she needs to get up for should require her to do it alone. Water, snacks, pillow adjustment, middle of the night anything — you handle it. Unreservedly.'}
+    ],
+    psychological:[
+      {icon:'🧘', act:'Be the calm in the room — actively', why:'Your emotional state in labor is contagious. Fear transfers. Calm transfers. Partners who have processed their own birth anxiety before the delivery room, who understand what they are witnessing, and who have practiced their role — are the difference between a frightening experience and an empowering one for both of you.'},
+      {icon:'🗣️', act:'Say the specific things she needs to hear — rehearse them', why:'In transition — the hardest part of labor — a partner saying exactly the right words can be the thing that gets her through. What are those words for her specifically? Ask her now. Practice saying them. "You are doing it." "I am right here." "The baby is almost here." Whatever she needs — know it and say it without hesitation.'},
+      {icon:'❤️', act:'After the baby arrives — tell her what you witnessed', why:'In the hours after birth, when she is processing what just happened to her body and her identity, hearing from you specifically what you watched her do — the strength, the endurance, the moment the baby arrived — is one of the most powerful psychological gifts you can give. She will remember what you said in that room for the rest of her life.'}
+    ]
+  },
+  babyBenefit:[
+    {icon:'🎵', label:'Your Voice in the Delivery Room', desc:'Speak to your baby in the delivery room with the same voice and phrases it has been hearing for months. The moment of birth is an overwhelming sensory experience — your familiar voice is one of the most powerful tools available to calm and orient your newborn. Skin-to-skin contact immediately after birth combined with familiar voice and familiar music creates a neurological bridge from womb to world.', research:'Neonatal recognition of prenatal voices produces physiological calming — heart rate and cortisol reduction confirmed'},
+    {icon:'💛', label:'Immediate Skin-to-Skin for Both Partners', desc:'Skin-to-skin contact immediately after birth regulates the newborn\'s temperature, heart rate, blood sugar, and cortisol. It also triggers the hormonal cascade for milk production and bonding. Both parents doing skin-to-skin in the first hours has been shown to accelerate bonding for the non-birthing partner and improves infant outcomes across multiple measures. Advocate for this in the delivery room.', research:'Extensive evidence — WHO recommendation; skin-to-skin improves APGAR scores, temperature regulation, and breastfeeding initiation'},
+    {icon:'🧘', label:'The Oxytocin Environment at Birth', desc:'The environment in the delivery room in the minutes after birth shapes the first bonding experience. Low lighting, familiar voices, minimal interruption, skin-to-skin, and the absence of harsh stimuli all support the oxytocin surge that drives bonding. Your job as partner is to advocate for and protect this environment. Know your preferences and communicate them to the nursing staff before labor intensifies.', research:'Oxytocin cascade at birth is environment-sensitive — Michel Odent and subsequent research on undisturbed birth and bonding'}
+  ],
+  birthPrep:'5-1-1 rule: contractions 5 minutes apart, lasting 1 minute, for 1 hour — time to go. Water breaking regardless of contractions — time to go. Bag in the car. Gas in the car. One text to your support people and you move. You are ready.',
+  milestones:['Full term','Fully developed','Lungs complete','The beginning of everything']
+}
+
+};
+
+function getDataForWeek(week) {
+  if (weekData[week]) return weekData[week];
+  const keys = Object.keys(weekData).filter(k => !isNaN(Number(k))).map(Number).sort((a,b)=>a-b);
+  if (week < 5) return weekData.default_early;
+  let best = keys[0];
+  for (const k of keys) { if (k <= week) best = k; }
+  return weekData[best];
+}
+
+
+const affirmations = {
+  "default_early": {
+    aff: "Your body already knows exactly what to do. Before you feel a single symptom, before anything shows, something extraordinary is already happening inside you. Trust it completely.",
+    intent: "This week, create a quiet moment together each evening — no screens, no distractions. Just the two of you, present with the reality that your family is beginning."
+  },
+  5: { aff: "The nausea, the fatigue, the way everything smells — your body is doing this on purpose. It is protecting your baby with everything it has. You are not struggling. You are working.", intent: "This week, Hubby takes over every meal and every smell-producing task. Wifey's only job is to rest and nourish. Practice this as a team and let it become your rhythm." },
+  9: { aff: "You have carried this baby through its most critical weeks of formation. Every organ it will ever have exists now because of you. What you have done in these quiet, invisible weeks is extraordinary.", intent: "This week, go for a 15-minute walk together every evening. No agenda — just movement, fresh air, and the two of you building a habit that will carry you through the rest of this pregnancy." },
+  12: { aff: "You made it through the hardest weeks. The hormonal upheaval, the nausea, the exhaustion, the invisible work — it deserves to be celebrated. Your body did this. You did this.", intent: "Mark the end of the first trimester together in a meaningful way. Not publicly if that is not your style — but privately. Acknowledge what you have both been through and what you are walking into together." },
+  16: { aff: "You may feel the first flutters this week — those butterfly movements that are unmistakably your baby saying hello. When you feel them, know that what you have built inside you is real, alive, and already reaching toward you.", intent: "This week, play music you both love near the belly for 20 minutes each evening. Lie down together, Hubby's hand on the belly, and let the music be the first shared experience between all three of you." },
+  20: { aff: "Halfway. You are halfway to holding your baby. Everything you have done to get here — every meal, every sleepless night, every hard day — was for this. Halfway is worth celebrating together.", intent: "This week, lie together with Hubby's hand on the belly and read aloud from a book you love. Do it at the same time each night. This is now your baby's story — the one it will recognize at birth." },
+  28: { aff: "You are in the third trimester. Every single day from here is your baby growing stronger and getting ready to meet you. The finish line is real. You are going to make it — and you are going to be extraordinary.", intent: "This week, Hubby practices labor support techniques with you for 20 minutes. Use a timer to simulate contractions. Practice counter-pressure, breathing, and positioning together — not in the delivery room for the first time." },
+  36: { aff: "Your body is preparing for one of the most powerful experiences of your life. Everything tightening, softening, shifting — it is all working exactly as it should. Your body knows what it is doing. Trust it completely.", intent: "This week, choose the song or phrase that will be your family's first shared ritual — the one Hubby will say or sing the moment your baby arrives. Practice it together now so it is instinct when the moment comes." },
+  40: { aff: "You are about to meet the person you have been growing, protecting, and loving for 40 weeks. Everything you have done was for this. You are ready. Your body is ready. And you are not doing this alone.", intent: "This week, sit together quietly with Hubby's hands on the belly and tell your baby — out loud, together — who you are, that you are ready, and that you cannot wait to meet them. They can hear every word." }
+};
+
+function getAffirmation(week) {
+  if (affirmations[week]) return affirmations[week];
+  const keys = Object.keys(affirmations).filter(k=>!isNaN(Number(k))).map(Number).sort((a,b)=>a-b);
+  if (week < 5) return affirmations["default_early"];
+  let best = keys[0];
+  for (const k of keys) { if (k <= week) best = k; }
+  return affirmations[best];
+}
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function renderCards(week) {
+  const d = getDataForWeek(week);
+  const progress = getProgress(week);
+  const tri = getTrimester(week);
+  const section = document.getElementById('cards-section');
+  const af = getAffirmation(week);
+
+  // Update hero dynamic text
+  const affEl = document.getElementById('affirmation-text');
+  const intEl = document.getElementById('intention-text');
+  const nnEl = document.getElementById('hero-nickname');
+  if (affEl) affEl.textContent = af.aff;
+  if (intEl) intEl.textContent = af.intent;
+  const nicknames = ['Our little one','Our tiny miracle','Our growing star','Our little love'];
+  if (nnEl) nnEl.textContent = '🤍 ' + nicknames[week % nicknames.length] + ' is on the way';
+
+  section.innerHTML = `
+
+    <!-- WIFEY CARD FIRST -->
+    <div class="card wide" style="background:linear-gradient(145deg,#5C2D35 0%,#8B3A48 100%);border:1px solid rgba(232,196,184,0.25);">
+      <span class="card-icon">💛</span>
+      <div class="card-label" style="color:#F5C4B8;">For Wifey — This Week</div>
+      <div class="card-title" style="color:white;">What your body is doing and what you may be feeling</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.02rem;font-style:italic;color:white;line-height:1.75;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.12);">${d.mentalHealth}</div>
+      <div class="grid2">
+        ${d.momFeels.map(s=>`<div class="grid-item" style="background:rgba(255,255,255,0.08);"><div class="grid-dot" style="background:#F5C4B8;"></div><span style="color:rgba(255,255,255,0.85);">${s}</span></div>`).join('')}
+      </div>
+    </div>
+
+
+    <div class="card">
+      <span class="card-icon">📏</span>
+      <div class="card-label">Baby's Current Size</div>
+      <div class="card-title">About the size of a ${d.sizeName}</div>
+      <div class="size-visual">
+        <div class="size-emoji-big">${d.sizeEmoji}</div>
+        <div>
+          <div class="size-name">${d.sizeName}</div>
+          <div style="font-size:0.78rem;color:#7A9488;margin-bottom:8px;">Approximate comparison</div>
+          <div class="size-stats">
+            ${d.lengthCm>0?`<div class="size-stat"><div class="size-stat-val">${d.lengthCm} cm</div><div class="size-stat-label">Length</div></div>`:''}
+            ${d.weightG>0?`<div class="size-stat"><div class="size-stat-val">${d.weightG}g</div><div class="size-stat-label">Weight</div></div>`:''}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="card-icon">🗓️</span>
+      <div class="card-label">Pregnancy Progress</div>
+      <div class="card-title">${tri} · Week ${week} of 40</div>
+      <div class="progress-wrap">
+        <div class="progress-header"><span>Week 1</span><span style="color:#C9A96E;font-weight:600;">${Math.round(progress)}% complete</span><span>Week 40</span></div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${progress}%"></div></div>
+        <div class="trimester-markers"><span>T1 ends W13</span><span>T2 ends W27</span><span>Full term W40</span></div>
+      </div>
+      <div class="pill-wrap">${d.milestones.map(m=>`<span class="pill gold">${m}</span>`).join('')}</div>
+    </div>
+
+    <div class="card wide">
+      <span class="card-icon">🧬</span>
+      <div class="card-label">Baby's Development This Week</div>
+      <div class="card-title">What's happening inside right now</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:4px;">
+        ${d.development.map(item=>`<div class="dev-item">${item}</div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="card-icon">💛</span>
+      <div class="card-label">What Mom May Be Feeling</div>
+      <div class="card-title">Her experience this week</div>
+      <div class="grid2">${d.momFeels.map(s=>`<div class="grid-item"><div class="grid-dot"></div><span>${s}</span></div>`).join('')}</div>
+    </div>
+
+    <div class="card">
+      <span class="card-icon">🧠</span>
+      <div class="card-label">Emotional Wellbeing</div>
+      <div class="card-title">Mind and mood this week</div>
+      <div class="card-body">${d.mentalHealth}</div>
+    </div>
+
+    <div class="card">
+      <span class="card-icon">🥗</span>
+      <div class="card-label">Nutrition This Week</div>
+      <div class="card-title">What to focus on eating</div>
+      <div class="nutrition-list">${d.nutrition.map(n=>`<div class="nutrition-item"><span style="font-size:1rem;flex-shrink:0">${n.icon}</span><span><strong>${n.name}:</strong> ${n.detail}</span></div>`).join('')}</div>
+    </div>
+
+    <div class="card">
+      <span class="card-icon">🏃‍♀️</span>
+      <div class="card-label">Movement & Exercise</div>
+      <div class="card-title">Staying active safely</div>
+      <div class="card-body">${d.exercise}</div>
+    </div>
+
+    <div class="card">
+      <span class="card-icon">🌙</span>
+      <div class="card-label">Sleep & Rest</div>
+      <div class="card-title">Getting the rest you both need</div>
+      <div class="card-body">${d.sleep}</div>
+    </div>
+
+    <div class="card">
+      <span class="card-icon">🏥</span>
+      <div class="card-label">Appointments & Screenings</div>
+      <div class="card-title">What's coming up medically</div>
+      <div class="appt-list">${d.appointments.map(a=>`<div class="appt-item"><span style="font-size:1rem;flex-shrink:0">📋</span><span>${a}</span></div>`).join('')}</div>
+      ${d.apptDetail&&d.apptDetail.length?`<div style="margin-top:12px;padding:12px;background:#F0F7F3;border-radius:10px;font-size:0.82rem;line-height:1.6;color:#4A6558;">${d.apptDetail.join(' ')}</div>`:''}
+    </div>
+
+    <div class="card wide benefit-card">
+      <span class="card-icon">🌱</span>
+      <div class="card-label">Proven Ways to Benefit Your Baby This Week</div>
+      <div class="card-title">Evidence-based actions that directly support development</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0;margin-top:8px;">
+        ${d.babyBenefit.map(b=>`
+          <div class="benefit-item">
+            <span class="benefit-icon">${b.icon}</span>
+            <div>
+              <div class="benefit-label">${b.label}</div>
+              <div style="font-size:0.855rem;line-height:1.65;color:rgba(255,255,255,0.82);">${b.desc}</div>
+              <span class="research-tag">Research: ${b.research}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="card wide partner-card">
+      <span class="card-icon">💪</span>
+      <div class="card-label">Hubby's Role This Week</div>
+      <div class="card-title">Specific, high-impact actions — physical and psychological</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px;" class="partner-cols">
+        <div>
+          <div class="partner-section-title">Physical Support</div>
+          ${d.partnerDeep.physical.map(p=>`
+            <div class="partner-item">
+              <span class="partner-item-icon">${p.icon}</span>
+              <div><strong style="color:var(--gold-light);display:block;margin-bottom:3px;">${p.act}</strong>${p.why}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div>
+          <div class="partner-section-title">Psychological Support</div>
+          ${d.partnerDeep.psychological.map(p=>`
+            <div class="partner-item">
+              <span class="partner-item-icon">${p.icon}</span>
+              <div><strong style="color:var(--gold-light);display:block;margin-bottom:3px;">${p.act}</strong>${p.why}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="card-icon">🌿</span>
+      <div class="card-label">Birth Preparation</div>
+      <div class="card-title">Getting ready for the big day</div>
+      <div class="card-body">${d.birthPrep}</div>
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────
+// TICKER
+// ─────────────────────────────────────────────
+function pad(n) { return String(Math.floor(n)).padStart(2,'0'); }
+function tick() {
+  const now = getCentralNow(), week = getWeek(), d = getDataForWeek(week), ms = getDaysRemaining();
+  const totalSec = Math.floor(ms/1000);
+  document.getElementById('cd-days').textContent = Math.floor(totalSec/86400);
+  document.getElementById('cd-hours').textContent = pad(Math.floor((totalSec%86400)/3600));
+  document.getElementById('cd-min').textContent = pad(Math.floor((totalSec%3600)/60));
+  document.getElementById('cd-sec').textContent = pad(totalSec%60);
+  document.getElementById('week-num').textContent = week;
+  document.getElementById('ring-label').textContent = 'Week '+week;
+  document.getElementById('baby-emoji').textContent = d.emoji;
+  document.getElementById('trimester-label').textContent = getTrimester(week);
+  document.getElementById('ring-fill').style.strokeDashoffset = 2*Math.PI*75*(1-getProgress(week)/100);
+  const timeStr = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+  const dateStr = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('clock-display').textContent = dateStr+' · '+timeStr+' Central';
+}
+let lastWeek = null;
+function tick() {
+  const now = getCentralNow();
+  const week = getWeek();
+  const d = getDataForWeek(week);
+  const ms = getDaysRemaining();
+  const totalSec = Math.floor(ms/1000);
+  document.getElementById('cd-days').textContent = Math.floor(totalSec/86400);
+  document.getElementById('cd-hours').textContent = pad(Math.floor((totalSec%86400)/3600));
+  document.getElementById('cd-min').textContent = pad(Math.floor((totalSec%3600)/60));
+  document.getElementById('cd-sec').textContent = pad(totalSec%60);
+  document.getElementById('week-num').textContent = week;
+  document.getElementById('ring-label').textContent = 'Week '+week;
+  document.getElementById('baby-emoji').textContent = d.emoji;
+  document.getElementById('trimester-label').textContent = getTrimester(week);
+  document.getElementById('ring-fill').style.strokeDashoffset = 2*Math.PI*75*(1-getProgress(week)/100);
+  const timeStr = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+  const dateStr = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('clock-display').textContent = dateStr+' · '+timeStr+' Central';
+  if (week !== lastWeek) { renderCards(week); lastWeek = week; }
+}
+tick();
+setInterval(tick,1000);
+</script>
+</body>
+</html>
